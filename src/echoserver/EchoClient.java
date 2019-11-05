@@ -1,12 +1,13 @@
 package echoserver;
 
+import javax.sound.midi.SysexMessage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
 public class EchoClient {
-	public static final int PORT_NUMBER = 6013;
+	private static final int PORT_NUMBER = 6013;
 
 	public static void main(String[] args) throws IOException {
 		EchoClient client = new EchoClient();
@@ -15,15 +16,17 @@ public class EchoClient {
 
 	static class ReadFromStd extends Thread {
 		OutputStream os;
-		public ReadFromStd(OutputStream os) {
-			this.os = os;
+		Socket socket;
+		ReadFromStd(Socket socket) throws IOException {
+			this.os = socket.getOutputStream();
+			this.socket = socket;
 		}
 		public void run() {
 			try {
-				int i = 0;
-				while (i < 10000) {
-					os.write(System.in.read());
-					i++;
+				int i = System.in.read();
+				while (i != '\0') {
+					os.write(i);
+					i = System.in.read();
 				}
 				os.flush();
 			}
@@ -43,15 +46,17 @@ public class EchoClient {
 
 	static class WriteToStd extends Thread {
 		InputStream is;
-		public WriteToStd(InputStream is) {
-			this.is = is;
+		Socket sock;
+		public WriteToStd(Socket socket) throws IOException {
+			this.is = socket.getInputStream();
+			this.sock = socket;
 		}
 		public void run() {
 			try {
-				int i = 0;
-				while (i < 10000) {
-					System.out.write(is.read());
-					i++;
+				int i = is.read();
+				while (i != '\0') {
+					System.out.write(i);
+					i = is.read();
 				}
 				System.out.flush();
 			}
@@ -61,15 +66,15 @@ public class EchoClient {
 		}
 	}
 
+
 	private void start() throws IOException {
 		Socket socket = new Socket("localhost", PORT_NUMBER);
-		InputStream socketInputStream = socket.getInputStream();
-		OutputStream socketOutputStream = socket.getOutputStream();
 
 		// Put your code here.
-		WriteToStd writeThread = new WriteToStd(socketInputStream);
-		ReadFromStd readerThread = new ReadFromStd(socketOutputStream);
+		WriteToStd writeThread = new WriteToStd(socket);
+		ReadFromStd readerThread = new ReadFromStd(socket);
 		writeThread.start();
 		readerThread.start();
+
 	}
 }

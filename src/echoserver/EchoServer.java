@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class EchoServer {
 	public static final int PORT_NUMBER = 6013;
@@ -36,15 +37,20 @@ public class EchoServer {
 		}
 
 		public void run(){
-			while(true){
+			while(!s.isClosed()){
 				try{
 					out.write(in.read());
-
-				}catch(Exception e){
+				}catch(SocketException se){
+					System.out.println("client disconnected :(");
+					Thread.currentThread().interrupt();
+					return;
+				}
+				catch (Exception e) {
 					e.printStackTrace();
 				}
 				if(! s.isConnected()){
-					break;
+					Thread.currentThread().interrupt();
+					return;
 				}
 			}
 		}
