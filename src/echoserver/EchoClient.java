@@ -13,22 +13,52 @@ public class EchoClient {
 		client.start();
 	}
 
-	private void readFromStdIn(OutputStream outputStream) throws IOException {
-		int i = 0;
-		while (i < 10000) {
-			outputStream.write(System.in.read());
-			i++;
+	static class ReadFromStd extends Thread {
+		OutputStream os;
+		public ReadFromStd(OutputStream os) {
+			this.os = os;
 		}
-		outputStream.flush();
+		public void run() {
+			try {
+				int i = 0;
+				while (i < 10000) {
+					os.write(System.in.read());
+					i++;
+				}
+				os.flush();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+			finally {
+				try {
+					os.close();
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
-	private void writeToStdOut(InputStream inputStream) throws IOException {
-		int i = 0;
-		while (i < 10000) {
-			System.out.write(inputStream.read());
-			i++;
+	static class WriteToStd extends Thread {
+		InputStream is;
+		public WriteToStd(InputStream is) {
+			this.is = is;
 		}
-		System.out.flush();
+		public void run() {
+			try {
+				int i = 0;
+				while (i < 10000) {
+					System.out.write(is.read());
+					i++;
+				}
+				System.out.flush();
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private void start() throws IOException {
@@ -37,5 +67,7 @@ public class EchoClient {
 		OutputStream socketOutputStream = socket.getOutputStream();
 
 		// Put your code here.
+		WriteToStd writeThread = new WriteToStd(socketInputStream);
+		ReadFromStd readerThread = new ReadFromStd(socketOutputStream);
 	}
 }
