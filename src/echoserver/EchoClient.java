@@ -69,5 +69,7 @@ public class EchoClient {
 		// Put your code here.
 		WriteToStd writeThread = new WriteToStd(socketInputStream);
 		ReadFromStd readerThread = new ReadFromStd(socketOutputStream);
+		writeThread.start();
+		readerThread.start();
 	}
 }
