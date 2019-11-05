@@ -18,10 +18,35 @@ public class EchoServer {
 		ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
 		while (true) {
 			Socket socket = serverSocket.accept();
-			InputStream inputStream = socket.getInputStream();
-			OutputStream outputStream = socket.getOutputStream();
-
 			// Put your code here.
+			Connection c = new Connection(socket);
+			Thread t = new Thread(c);
+			t.start();
+		}
+	}
+
+	class Connection implements Runnable {
+		private Socket s;
+		private InputStream in;
+		private OutputStream out;
+		Connection(Socket s) throws IOException{
+			this.s = s;
+			in = s.getInputStream();
+			out = s.getOutputStream();
+		}
+
+		public void run(){
+			while(true){
+				try{
+					out.write(in.read());
+
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+				if(! s.isConnected()){
+					break;
+				}
+			}
 		}
 	}
 }
