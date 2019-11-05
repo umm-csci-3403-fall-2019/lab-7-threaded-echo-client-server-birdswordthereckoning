@@ -13,6 +13,24 @@ public class EchoClient {
 		client.start();
 	}
 
+	private void readFromStdIn(OutputStream outputStream) throws IOException {
+		int i = 0;
+		while (i < 10000) {
+			outputStream.write(System.in.read());
+			i++;
+		}
+		outputStream.flush();
+	}
+
+	private void writeToStdOut(InputStream inputStream) throws IOException {
+		int i = 0;
+		while (i < 10000) {
+			System.out.write(inputStream.read());
+			i++;
+		}
+		System.out.flush();
+	}
+
 	private void start() throws IOException {
 		Socket socket = new Socket("localhost", PORT_NUMBER);
 		InputStream socketInputStream = socket.getInputStream();
