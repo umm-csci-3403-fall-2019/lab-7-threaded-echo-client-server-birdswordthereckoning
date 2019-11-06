@@ -24,15 +24,18 @@ public class EchoClient {
 		public void run() {
 			try {
 				int i = System.in.read();
-				while (i != '\0') {
-					os.write(i);
+				os.write(i);
+				while (i != -1) {
 					i = System.in.read();
+					os.write(i);
 				}
-				os.flush();
+				socket.shutdownOutput();
+				Thread.currentThread().interrupt();
 			}
 			catch (IOException e) {
 				e.printStackTrace();
 			}
+			/*
 			finally {
 				try {
 					os.close();
@@ -41,6 +44,7 @@ public class EchoClient {
 					e.printStackTrace();
 				}
 			}
+			 */
 		}
 	}
 
@@ -54,11 +58,14 @@ public class EchoClient {
 		public void run() {
 			try {
 				int i = is.read();
-				while (i != '\0') {
+				while (i != 255) {
 					System.out.write(i);
 					i = is.read();
 				}
-				System.out.flush();
+				//System.out.flush();
+				sock.shutdownInput();
+				Thread.currentThread().interrupt();
+
 			}
 			catch (IOException e) {
 				e.printStackTrace();

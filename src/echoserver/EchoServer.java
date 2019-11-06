@@ -10,12 +10,12 @@ import java.net.SocketException;
 public class EchoServer {
 	public static final int PORT_NUMBER = 6013;
 
-	public static void main(String[] args) throws IOException, InterruptedException {
+	public static void main(String[] args) throws IOException {
 		EchoServer server = new EchoServer();
 		server.start();
 	}
 
-	private void start() throws IOException, InterruptedException {
+	private void start() throws IOException {
 		ServerSocket serverSocket = new ServerSocket(PORT_NUMBER);
 		while (true) {
 			Socket socket = serverSocket.accept();
@@ -41,7 +41,6 @@ public class EchoServer {
 				try{
 					out.write(in.read());
 				}catch(SocketException se){
-					System.out.println("client disconnected :(");
 					Thread.currentThread().interrupt();
 					return;
 				}
