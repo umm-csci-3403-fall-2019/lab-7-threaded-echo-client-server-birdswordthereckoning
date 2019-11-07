@@ -37,20 +37,18 @@ public class EchoServer {
 		}
 
 		public void run(){
-			while(!s.isClosed()){
-				try{
-					out.write(in.read());
-				}catch(SocketException se){
-					Thread.currentThread().interrupt();
-					return;
+			try{
+				int i;
+				while((i = in.read()) != -1){
+					out.write(i);
 				}
-				catch (Exception e) {
-					e.printStackTrace();
-				}
-				if(! s.isConnected()){
-					Thread.currentThread().interrupt();
-					return;
-				}
+				out.flush();
+				s.shutdownOutput();
+			}catch(SocketException se){
+				Thread.currentThread().interrupt();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 	}

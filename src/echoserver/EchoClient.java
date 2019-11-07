@@ -23,49 +23,35 @@ public class EchoClient {
 		}
 		public void run() {
 			try {
-				int i = System.in.read();
-				os.write(i);
-				while (i != -1) {
-					i = System.in.read();
+				int i;
+				while ((i = System.in.read()) != -1) {
 					os.write(i);
 				}
+				os.flush();
 				socket.shutdownOutput();
-				Thread.currentThread().interrupt();
 			}
 			catch (IOException e) {
 				e.printStackTrace();
 			}
-			/*
-			finally {
-				try {
-					os.close();
-				}
-				catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			 */
 		}
 	}
 
 	static class WriteToStd extends Thread {
 		InputStream is;
 		Socket sock;
+		boolean toClose = false;
 		public WriteToStd(Socket socket) throws IOException {
 			this.is = socket.getInputStream();
 			this.sock = socket;
 		}
 		public void run() {
 			try {
-				int i = is.read();
-				while (i != 255) {
+				int i;
+				while ((i =is.read()) != -1) {
 					System.out.write(i);
-					i = is.read();
 				}
-				//System.out.flush();
+				System.out.flush();
 				sock.shutdownInput();
-				Thread.currentThread().interrupt();
-
 			}
 			catch (IOException e) {
 				e.printStackTrace();
